@@ -3,7 +3,9 @@ import * as userDao from "../dao/user.dao.js";
 
 export const googleAuthCallback = (req,res)=>{
 const userdata = req.user
+console.log( "this is user data from google",req.user );
 const user = userDao.findUserBYEmailid(userdata.email[0].value
+
 )
 if(!user){
     userDao.createUser({

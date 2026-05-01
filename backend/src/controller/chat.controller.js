@@ -1,44 +1,41 @@
-import { getTitle } from "../services/Ai.services.js";
-import * as utils from "../utils/utils.js";
-export const handleMessages = async (req, res) => {
-  const { content, chatId } = req.body;
+import * as chatDao from "../dao/user.dao.js";
+import { getAIResponse, getTitle } from "../services/ai.services.js";
 
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("connection", "keep-alive");
-  res.setHeader("Cache-Control", "no-cache");
 
-  const Generatedtitle = async () => {
-    if (!chatId) {
-      const data = await getTitle({ messages: content });
-      const chat = await chatdao.createChat({
-        title: data.chatTitle,
-        userId: req.user._id,
-      });
-      res.write(`data: ${JSON.stringify({ chatId: chat._id })}\n\n`);
-      return chat;
+export async function handleMessage(req, res) {
+    const { content, chatId } = req.body;
+    console.log("Incoming request: from ai ", req.body);
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+
+    const generateTitle = async () => {
+        if (!chatId) {
+            const data = await getTitle({ message: content })
+            const chat = await chatDao.createChat({ title: data.chatTitle, user: req.user.id })
+            res.write(`title: ${JSON.stringify({ title: data.chatTitle, chatId: chat._id })}\n\n`)
+            return chat
+        }
+        return null
     }
 
-    return null;
-  };
+    const aiStream = async () => {
+        const stream = await getAIResponse({ content });
 
-  const aiStream = async () => {
-    const stream = await getAIResponse({ content });
+        let AIMessage = ""
 
-    let AiMessage = "";
+        for await (const chunk of stream) {
+            AIMessage += chunk[ 0 ].contentBlocks[ 0 ].text;
+            res.write(`data: ${JSON.stringify({ text: chunk[ 0 ].contentBlocks[ 0 ].text })}\n\n`);
+        }
 
-    for await (const chunk of stream) {
-      AiMessage += chunk[0].contentBlocks[0].text;
-      res.write(
-        `data: ${JSON.stringify({ text: chunk[0].contentBlocks[0].text })}\n\n`,
-      );
+        return AIMessage
     }
-    return AiMessage;
 
-  };
-  const [chat, AiMessage] = await Promise.all([
-    Generatedtitle(),
-    aiStream(),
-  ]);
+    const [ chat, AIMessage ] = await Promise.all([ generateTitle(), aiStream() ])
 
-res.end();
-};
+    // res.write(`data: [DONE]\n\n`);
+    res.end()
+}

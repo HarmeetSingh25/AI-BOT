@@ -1,39 +1,38 @@
-import cookieParser from "cookie-parser";
-import express from "express";
-import morgan from "morgan";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import config from "../src/config/config.js";
-import Authroutes from "./routes/app.route.js";
+import express from 'express';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+import authRoutes from './routes/app.route.js';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import config from './config/config.js';
+import chatRoutes from './routes/chat.route.js';
+
 const app = express();
 
+app.use(morgan('dev'));
 app.use(express.json());
-app.use(morgan("dev"));
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(passport.initialize());
 
-// console.log(config.clientID , config.clientSecret , "this test");
-// Configure Passport to use Google OAuth 2.0 strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: config.clientID,
-      clientSecret: config.clientSecret,
-      callbackURL: "http://localhost:5173/api/auth/google/callback",
-    },
+passport.use(new GoogleStrategy({
+    clientID: config.clientID,
+    clientSecret: config.clientSecret,
+    callbackURL: "http://localhost:5173/api/auth/google/callback"
+},
     (accessToken, refreshToken, profile, done) => {
-      // Here, you would typically find or create a user in your database
-      // For this example, we'll just return the profile
-      return done(null, profile);
-    },
-  ),
+        // Handle user authentication logic here
+        done(null, profile);
+    })
 );
 
-app.use('/api/auth', Authroutes);
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+    res.status(200).json({ status: "ok" });
 });
+
+app.use('/api/auth', authRoutes);
+app.use('/api/chats', chatRoutes);
+
 
 export default app;

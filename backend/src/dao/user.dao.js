@@ -1,4 +1,4 @@
-import userModel from "../models/user.models";
+import userModel from "../models/user.models.js";
 
 export async function findUserBYEmailid(email){
 const user = await userModel.findOne({email})
