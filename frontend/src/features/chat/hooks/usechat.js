@@ -16,7 +16,7 @@ export const useChat = () => {
 
     async function handleGetAIResponse({ message, chatId }) {
 
-        console.log("chatId", chatId)
+        // console.log("chatId", chatId)
         if (!chatId) {
             dispatch(appendTempMessage({
                 role: "user",
@@ -34,11 +34,11 @@ export const useChat = () => {
             message, chatId,
             onContent: (content) => {
                 dispatch(appendTempMessageContent({ index: 1, content }))
-                console.log("content", content)
+                // console.log("content", content)
             },
             onChat: (chat) => {
                 dispatch(setTempChat({ chat }))
-                console.log("chat", chat)
+                // console.log("chat", chat)
             },
             onComplete: () => {
                 dispatch(setChatFromTempChat())

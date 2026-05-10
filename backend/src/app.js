@@ -6,15 +6,15 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import config from './config/config.js';
 import chatRoutes from './routes/chat.route.js';
-
 const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 app.use(passport.initialize());
+
+
 
 passport.use(new GoogleStrategy({
     clientID: config.clientID,

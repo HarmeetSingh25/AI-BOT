@@ -12,6 +12,7 @@ const Home = () => {
   
   const currentChatId = useSelector((state) => state.chat.currentChatId)
   const chats = useSelector((state) => state.chat.chats)
+  
 
   
   const currentChat = chats[currentChatId]

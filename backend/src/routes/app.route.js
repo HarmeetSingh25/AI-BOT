@@ -16,16 +16,17 @@ Authroutes.get(
     session: false,
     failureRedirect: "/login",
   }),
-  (req, res) => {
-    console.log(req.user); // debug
+    // (req, res) => {
+    //   console.log(req.user); // debug
 
-    const email = req.user?.emails?.[0]?.value;
+    //   const email = req.user?.emails?.[0]?.value;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email missing" });
-    }
+    //   if (!email) {
+    //     return res.status(400).json({ message: "Email missing" });
+    //   }
 
-    res.redirect("http://localhost:5173/home");
-  }
+    //   res.redirect("http://localhost:5173/home");
+    // }
+  googleAuthCallback
 );
 export default Authroutes;

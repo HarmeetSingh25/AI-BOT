@@ -32,9 +32,13 @@ export async function getTitle({ messages }) {
     ),
   });
 
+  // const response = await titleAgent.invoke({
+  //   messages,
+  //   content: `Generate a concise title for the following message: ${messages}`,
+  // });
+
   const response = await titleAgent.invoke({
-    messages,
-    content: `Generate a concise title for the following message: ${messages}`,
+    messages: [{ role: "user", content: `Generate a concise title for the following message: ${messages}` }],
   });
 
   return response.structuredResponse;
